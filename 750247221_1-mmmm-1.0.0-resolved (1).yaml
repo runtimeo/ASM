@@ -1,0 +1,416 @@
+---
+openapi: 3.0.0
+info:
+  title: Automatic Selling Machine (ASM) API
+  description: API interface for managing and interacting with an automatic selling machine.
+  version: 1.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/750247221_1/mmmm/1.0.0
+  description: SwaggerHub API Auto Mocking
+- url: https://example.com/api
+  description: Production server
+paths:
+  /purchase:
+    post:
+      tags:
+      - Purchase
+      summary: Purchase items from the machine
+      operationId: purchaseItems
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/purchase_body'
+        required: true
+      responses:
+        "200":
+          description: Purchase successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        "400":
+          description: "Purchase failed (e.g., insufficient stock, insufficient coins)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400'
+  /admin/login:
+    post:
+      tags:
+      - Admin
+      summary: Admin login
+      operationId: adminLogin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/admin_login_body'
+        required: true
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "401":
+          description: "Unauthorized (e.g., wrong credentials)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_401'
+  /item/updateQuantity:
+    patch:
+      tags:
+      - Admin
+      summary: Update the quantity of an existing item
+      operationId: updateItemQuantity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/item_updateQuantity_body'
+        required: true
+      responses:
+        "200":
+          description: Item quantity updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "400":
+          description: "Invalid request (e.g., invalid item ID or quantity)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400_1'
+  /item/add:
+    post:
+      tags:
+      - Admin
+      summary: Add a new item type to the machine
+      operationId: addItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/item_add_body'
+        required: true
+      responses:
+        "201":
+          description: New item added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "400":
+          description: "Invalid request (e.g., duplicate item ID or type)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400_2'
+  /item/delete:
+    delete:
+      tags:
+      - Admin
+      summary: Delete an item type from the machine
+      operationId: deleteItem
+      parameters:
+      - name: item_id
+        in: query
+        description: ID of the item to delete
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Item deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "404":
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+  /item/updatePrice:
+    patch:
+      tags:
+      - Admin
+      summary: Update the price of an existing item
+      operationId: updateItemPrice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/item_updatePrice_body'
+        required: true
+      responses:
+        "200":
+          description: Item price updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_1'
+        "400":
+          description: "Invalid request (e.g., invalid item ID or price)"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_400_3'
+  /items/list:
+    get:
+      tags:
+      - Items
+      summary: Get a list of all items available in the machine
+      operationId: listItems
+      responses:
+        "200":
+          description: A list of items retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/inline_response_200_2'
+  /admin/logout:
+    post:
+      tags:
+      - Admin
+      summary: Admin logout from the system
+      operationId: adminLogout
+      responses:
+        "200":
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_3'
+        "401":
+          description: Unauthorized request or already logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_401_1'
+  /item/detail:
+    get:
+      tags:
+      - Items
+      summary: Get detailed information about a specific item
+      operationId: getItemDetails
+      parameters:
+      - name: item_id
+        in: query
+        description: ID of the item to get details for
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Detailed item information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_4'
+        "404":
+          description: Item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_404'
+components:
+  schemas:
+    purchase_body:
+      required:
+      - item_id
+      - quantity
+      type: object
+      properties:
+        item_id:
+          type: string
+          description: ID of the item to purchase
+        quantity:
+          type: integer
+          description: Number of items to purchase
+    inline_response_200:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Item provided
+    inline_response_400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Insufficient stock or coins
+    admin_login_body:
+      required:
+      - password
+      - username
+      type: object
+      properties:
+        username:
+          type: string
+          description: Admin username
+        password:
+          type: string
+          description: Admin password
+    inline_response_200_1:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+    inline_response_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Invalid username or password
+    item_updateQuantity_body:
+      required:
+      - item_id
+      - new_quantity
+      type: object
+      properties:
+        item_id:
+          type: string
+          description: ID of the item to update
+        new_quantity:
+          type: integer
+          description: New quantity of the item
+    inline_response_400_1:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Invalid item ID or quantity
+    item_add_body:
+      required:
+      - item_id
+      - item_type
+      - quantity
+      type: object
+      properties:
+        item_id:
+          type: string
+          description: Unique ID for the new item
+        item_type:
+          type: string
+          description: Type of the new item
+        quantity:
+          type: integer
+          description: Initial quantity of the new item
+    inline_response_400_2:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Duplicate item ID or invalid type
+    inline_response_404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Item not found
+    item_updatePrice_body:
+      required:
+      - item_id
+      - new_price
+      type: object
+      properties:
+        item_id:
+          type: string
+          description: ID of the item to update
+        new_price:
+          type: number
+          description: New price of the item
+          format: float
+    inline_response_400_3:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Invalid item ID or price
+    inline_response_200_2:
+      type: object
+      properties:
+        item_id:
+          type: string
+          description: Unique identifier for the item
+        item_name:
+          type: string
+          description: Name of the item
+        price:
+          type: number
+          description: Price of the item
+          format: float
+        quantity:
+          type: integer
+          description: Current stock of the item
+    inline_response_200_3:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Logged out successfully
+    inline_response_401_1:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Not logged in or invalid session
+    inline_response_200_4:
+      type: object
+      properties:
+        item_id:
+          type: string
+          description: Unique identifier for the item
+        item_name:
+          type: string
+          description: Name of the item
+        price:
+          type: number
+          description: Price of the item
+          format: float
+        quantity:
+          type: integer
+          description: Current stock of the item
+        description:
+          type: string
+          description: Additional information about the item
